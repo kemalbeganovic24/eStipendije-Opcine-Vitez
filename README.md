@@ -48,4 +48,4 @@ U razvoju (MVP faza).
 
 ## Autor
 
-[Tvoje ime], student softverskog inženjerstva
+Kemal Beganović, student 3. godine softverskog inženjerstva.
