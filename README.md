@@ -1,4 +1,4 @@
-# eStipendije-Op-ine-Vitez
+# eStipendije-Općine-Vitez
 Digitalna platforma za prijavu, bodovanje i dodjelu stipendija Općine Vitez.
 
 ## O projektu
