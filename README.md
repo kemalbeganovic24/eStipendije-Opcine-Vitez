@@ -4,7 +4,6 @@ Desktop aplikacija za upravljanje stipendijama Općine Vitez.
 
 *Radni naziv projekta. Projektni zadatak iz predmeta Metode razvoja softvera, Politehnički fakultet Univerziteta u Zenici, akademska 2026/2027.*
 
-![CI](https://github.com/<korisnik>/<repozitorij>/actions/workflows/ci.yml/badge.svg)
 
 ---
 
