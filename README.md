@@ -316,10 +316,10 @@ U folderu `docs/`:
 
 ## 17. Tim
 
-- **Kemal Beganović:** *(uloga)*
-- **[Ime i prezime]:** *(uloga)*
-- **[Ime i prezime]:** *(uloga)*
-- **[Ime i prezime]:** *(uloga)*
+- **Kemal Beganović:** *vođa tima*
+- **Emir Đelilbašić:** *član*
+- **Ramo Kozlić:** *član*
+- **Mugdin Krnjić:** *član*
 
 Politehnički fakultet Univerziteta u Zenici, Softversko inženjerstvo, akademska 2026/2027.
 
@@ -331,4 +331,4 @@ U razvoju. Zadnje ažuriranje: 14.10.2026.
 
 ## 19. Licenca i vlasništvo
 
-Prava na izvorni kod i uslovi korištenja bit će definisani ugovorom s Općinom Vitez i pravilima fakulteta.
+Prava na izvorni kod i uslovi korištenja bit će definisani ugovorom s Općinom Vitez i pravilima studenata.
