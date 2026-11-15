@@ -1,5 +1,7 @@
 # Vitez eStipendija
 
+[![CI](https://github.com/kemalbeganovic24/eStipendije-Opcine-Vitez/actions/workflows/ci.yml/badge.svg)](https://github.com/kemalbeganovic24/eStipendije-Opcine-Vitez/actions/workflows/ci.yml)
+
 Desktop aplikacija za upravljanje stipendijama Općine Vitez.
 
 *Radni naziv projekta. Projektni zadatak iz predmeta Metode razvoja softvera, Politehnički fakultet Univerziteta u Zenici, akademska 2026/2027.*
@@ -259,10 +261,10 @@ Upiši parametre baze u `application.properties`. Ta datoteka je u `.gitignore` 
 
 ## 11. CI/CD (GitHub Actions)
 
-- **CI:** nakon svakog push-a i pull requesta pokreće se build i JUnit testovi
+- **CI:** svaki push na `main`, `feature/**`, `docs/**` i `fix/**` grane te otvaranje, ažuriranje ili ponovno otvaranje pull requesta prema `main` pokreće `./mvnw -B clean verify` (build i dostupne testove).
+- **Okruženje:** `ubuntu-latest`, Temurin JDK 27 i keširanje Maven zavisnosti.
 - **Status:** badge na vrhu README-a prikazuje stanje zadnjeg builda
-- **CD:** JAR se sprema kao artefakt svakog uspješnog builda
-- **Verzionisanje:** stabilne verzije se označavaju Git tagom `v*` (npr. `v0.1.0`), a workflow automatski pravi GitHub Release s JAR-om
+- **Planirano:** objavljivanje JAR artefakata i automatski GitHub Release za stabilne verzije označene Git tagom `v*` (npr. `v0.1.0`).
 
 Workflow datoteka: `.github/workflows/ci.yml`
 
