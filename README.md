@@ -253,9 +253,28 @@ Upiši parametre baze u `application.properties`. Ta datoteka je u `.gitignore` 
 
 ### 4. Testovi i build
 
+Testovi koriste JUnit 5 i Maven Surefire. Potreban je JDK 27.
+Početna tri testa provjeravaju dostupnost i JavaFX tip klase `org.example.Main`,
+JDK 27 runtime i potpis `main` metode, bez pokretanja JavaFX prozora.
+
+Na Windowsu:
+
+```powershell
+.\mvnw.cmd test
+.\mvnw.cmd -B clean verify
 ```
-.\mvnw.cmd verify
+
+Na Linuxu/macOS-u:
+
+```bash
+chmod +x mvnw
+./mvnw test
+./mvnw -B clean verify
 ```
+
+Surefire izvještaji nalaze se u `target/surefire-reports/`. CI izvršava iste
+testove kroz `clean verify`; neuspješan test zaustavlja build. Build također
+pada ako Surefire ne pronađe nijedan test.
 
 ---
 
