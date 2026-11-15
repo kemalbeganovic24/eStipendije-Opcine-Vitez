@@ -148,7 +148,7 @@ Svaka ručna korekcija zahtijeva obrazloženje i bilježi se u audit log.
 
 ## 8. Tehnologije
 
-- **Jezik:** Java 25
+- **Jezik:** Java 27
 - **GUI:** JavaFX (FXML, CSS)
 - **Baza:** MySQL 8, JDBC, HikariCP
 - **PDF:** iText / PDFBox
@@ -192,14 +192,43 @@ stipvitez/
 ---
 
 ## 10. Pokretanje projekta
+### Pokretanje JavaFX aplikacije (Maven Wrapper)
 
+Projekat koristi JavaFX, JDK 27 i Maven. Za pokretanje nije potrebno 
+zasebno instalirati Maven jer projekat sadrži Maven Wrapper.
+
+**Postupak:**
+
+1. Klonirati GitHub repozitorij i otvoriti folder projekta u IntelliJ IDEA.
+2. U IntelliJ-u podesiti Project SDK na JDK 27.
+3. Učitati Maven zavisnosti iz `pom.xml`.
+4. Otvoriti terminal u glavnom folderu projekta.
+
+Na Windowsu pokrenuti:
+
+```powershell
+.\mvnw.cmd clean javafx:run
+```
+
+Na Linuxu i macOS-u:
+
+```bash
+./mvnw clean javafx:run
+```
+
+Aplikacija će otvoriti JavaFX prozor s naslovom **eStipendija Vitez**.
+
+Za zaustavljanje aplikacije zatvoriti JavaFX prozor ili prekinuti proces u terminalu pomoću `Ctrl + C`.
+
+**Napomena:** Trenutna verzija aplikacije prikazuje samo početni JavaFX prozor. Funkcionalnosti koje zahtijevaju MySQL
+bazu bit će dostupne nakon implementacije baze podataka i DAO sloja.
 ### Preduvjeti
-- JDK 25
-- Maven 3.9+
+- JDK 27
+- Maven 3.9+(zasebna instalacija nije potrebna ako se koristi Maven Wrapper)
 - MySQL 8 (lokalno ili Docker)
 
 ### 1. Baza podataka
-
+SQL skripte i konfiguracija baze bit će dodane u narednim fazama razvoja.
 ```
 docker run --name stipvitez-db -e MYSQL_ROOT_PASSWORD=<lozinka> -e MYSQL_DATABASE=stipvitez -p 3306:3306 -d mysql:8
 mysql -u root -p stipvitez < db/schema.sql
@@ -217,13 +246,13 @@ Upiši parametre baze u `application.properties`. Ta datoteka je u `.gitignore` 
 ### 3. Pokretanje
 
 ```
-mvn javafx:run
+.\mvnw.cmd javafx:run
 ```
 
 ### 4. Testovi i build
 
 ```
-mvn -B verify
+.\mvnw.cmd verify
 ```
 
 ---
@@ -257,8 +286,8 @@ Dokaz primjene (burndown, retrospektive, export zadataka) nalazi se u `docs/scru
 
 ## 13. Rad s Gitom
 
-- **Grane:** `main` (stabilno), `develop` (integracija), `feature/<opis>` (rad)
-- **Pull request** je obavezan za spajanje u `develop` i `main`, uz barem jedan review
+- **Grane:** `main` (stabilno),`feature/<opis>` (rad)
+- **Pull request** je obavezan za spajanje u `main`, uz barem jedan review
 - **Commit poruke** počinju ID-om zadatka iz YouTracka, npr. `STIP-42: dodan login ekran`
 - **Verzije** se označavaju tagovima (Semantic Versioning)
 
