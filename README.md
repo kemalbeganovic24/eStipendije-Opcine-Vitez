@@ -284,10 +284,11 @@ pada ako Surefire ne pronađe nijedan test.
 - **Kompajliranje:** korak `Compile application and tests` izvršava `./mvnw -B test-compile`.
 - **Testovi:** korak `Run JUnit tests` izvršava `./mvnw -B test`. Ako kompajliranje padne, testovi se preskaču; greška kompajliranja ili pad testa označava CI kao neuspješan.
 - **JUnit izvještaj:** `Publish JUnit test report` se izvršava uz `if: always()`, čak i nakon greške. Iz `target/surefire-reports/*.xml` prikazuje broj uspješnih, neuspješnih i preskočenih testova te pojedinačne rezultate u Actions sažetku i PR provjeri `JUnit test results`. Nedostatak XML izvještaja također označava korak neuspješnim, a ne kao prolazak testova.
-- **Pakovanje:** nakon uspješnih prethodnih koraka, `Package and verify` izvršava `./mvnw -B -DskipTests verify`, bez ponavljanja već izvršenih testova.
+- **Pakovanje:** nakon uspješnih prethodnih koraka, `Package application JAR` izvršava `./mvnw -B package -DskipTests`, bez ponavljanja već izvršenih testova. Nastaje `target/VitezeStipendija-1.0-SNAPSHOT.jar` s manifestom `Main-Class: org.example.Main`.
 - **Okruženje:** `ubuntu-latest`, Temurin JDK 27 i keširanje Maven zavisnosti.
 - **Status:** badge na vrhu README-a prikazuje stanje zadnjeg builda
-- **Planirano:** objavljivanje JAR artefakata i automatski GitHub Release za stabilne verzije označene Git tagom `v*` (npr. `v0.1.0`).
+- **CD:** korak `Upload application JAR` koristi `actions/upload-artifact@v4` i `if: success()` za objavu `target/VitezeStipendija-*.jar` pod nazivom `VitezeStipendija-jar`. Ako kompajliranje, testovi ili drugi prethodni koraci padnu, upload se preskače. Ako JAR nedostaje, upload korak prijavljuje grešku.
+- **Planirano:** automatski GitHub Release za stabilne verzije označene Git tagom `v*` (npr. `v0.1.0`).
 
 Workflow datoteka: `.github/workflows/ci.yml`
 
@@ -295,6 +296,13 @@ Na GitHubu otvori **Actions → CI → odabrano izvršavanje → Build and verif
 za status svakog koraka, a sažetak izvršavanja za JUnit izvještaj.
 U Pull Requestu otvori **Checks → JUnit test results** za detalje testova.
 Za spajanje u `main` potrebno je da CI prođe i kolega odobri review.
+
+Za preuzimanje paketa otvori **Actions → CI → uspješno izvršavanje → Artifacts**
+i klikni **VitezeStipendija-jar**. Preuzeti ZIP sadrži JAR aplikacije.
+JAR ne uključuje JavaFX zavisnosti ni JDK; manifest određuje glavnu klasu,
+ali za pokretanje je i dalje potrebno odgovarajuće Java/JavaFX okruženje.
+Za lokalno pokretanje iz projekta koristi `./mvnw javafx:run`
+(na Windowsu `.\mvnw.cmd javafx:run`).
 
 Objava posebne JUnit provjere koristi `checks: write` dozvolu standardnog
 `GITHUB_TOKEN` tokena; nije potreban lični token. Ovaj način objave namijenjen
