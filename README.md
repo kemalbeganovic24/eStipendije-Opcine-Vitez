@@ -288,7 +288,7 @@ pada ako Surefire ne pronađe nijedan test.
 - **Okruženje:** `ubuntu-latest`, Temurin JDK 27 i keširanje Maven zavisnosti.
 - **Status:** badge na vrhu README-a prikazuje stanje zadnjeg builda
 - **CD:** korak `Upload application JAR` koristi `actions/upload-artifact@v4` i `if: success()` za objavu `target/VitezeStipendija-*.jar` pod nazivom `VitezeStipendija-jar`. Ako kompajliranje, testovi ili drugi prethodni koraci padnu, upload se preskače. Ako JAR nedostaje, upload korak prijavljuje grešku.
-- **Planirano:** automatski GitHub Release za stabilne verzije označene Git tagom `v*` (npr. `v0.1.0`).
+- **Release:** push Git taga `v*` pokreće `.github/workflows/release.yml`. Na Temurin JDK-u 27 izvršava se `./mvnw -B clean verify`, zatim se objavljuje GitHub Release s automatskim bilješkama i JAR prilogom. Pad builda ili testova sprečava objavu; nedostatak JAR-a također prijavljuje grešku.
 
 Workflow datoteka: `.github/workflows/ci.yml`
 
@@ -309,6 +309,32 @@ Objava posebne JUnit provjere koristi `checks: write` dozvolu standardnog
 je timskim granama u istom repozitoriju. Za PR iz forka i Dependabot izvršavanja
 preskače se samo objava posebne provjere zbog read-only tokena; Actions sažetak
 i status CI posla ostaju dostupni.
+
+### Objavljivanje verzije
+
+Verzije označavamo tagovima `vMAJOR.MINOR.PATCH`: `v0.1.0` je prvi MVP,
+a `v1.0.0` je rezervisan za finalnu predaju. Prije označavanja verzije,
+promjene moraju biti spojene u `main` putem PR-a, uz review kolege i uspješan CI.
+
+Nakon spajanja release workflowa i uz čisto radno stablo:
+
+```powershell
+git switch main
+git pull --ff-only origin main
+git status
+git tag -a v0.1.0 -m "v0.1.0: prvi MVP"
+git push origin v0.1.0
+```
+
+Tag kreiraj samo ako je prethodno preuzimanje izmjena uspjelo i lokalni `main`
+odgovara pregledanoj verziji. Postojeće objavljene tagove ne pomjeramo;
+za naredne verzije koristimo novi broj verzije.
+
+Provjeri **Actions → Release**, zatim **Releases → v0.1.0 → Assets**.
+Očekivani prilog je `VitezeStipendija-1.0-SNAPSHOT.jar`. Git tag određuje
+verziju objave; Maven verzija i naziv JAR-a ostaju `1.0-SNAPSHOT` prema
+zahtjevu projekta. Release nije draft niti prerelease. Za objavu se koristi
+standardni `GITHUB_TOKEN` uz `contents: write`, bez dodatnog ličnog tokena.
 
 ---
 
