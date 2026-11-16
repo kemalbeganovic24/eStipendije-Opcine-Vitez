@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 jobs:
   build:
@@ -35,5 +36,39 @@ jobs:
       - name: Make Maven Wrapper executable
         run: chmod +x mvnw
 
-      - name: Build and verify with Maven
-        run: ./mvnw -B clean verify
+      - name: Compile application and tests
+        run: ./mvnw -B test-compile
+
+      - name: Run JUnit tests
+        run: ./mvnw -B test
+
+      - name: Publish JUnit test report
+        if: always()
+        uses: dorny/test-reporter@v3
+        with:
+          name: JUnit test results
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+          use-actions-summary: 'true'
+          list-tests: all
+          fail-on-error: 'true'
+          fail-on-empty: 'true'
+
+      - name: Package and verify
+        run: ./mvnw -B -DskipTests verify
+
+      - name: Publish JUnit PR check
+        if: >-
+          always() &&
+          github.actor != 'dependabot[bot]' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
+        uses: dorny/test-reporter@v3
+        with:
+          name: JUnit test results
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+          use-actions-summary: 'false'
+          list-tests: all
+          fail-on-error: 'true'
+          fail-on-empty: 'true'

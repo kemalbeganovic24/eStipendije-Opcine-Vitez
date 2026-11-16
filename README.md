@@ -273,19 +273,34 @@ chmod +x mvnw
 ```
 
 Surefire izvještaji nalaze se u `target/surefire-reports/`. CI izvršava iste
-testove kroz `clean verify`; neuspješan test zaustavlja build. Build također
+testove u zasebnom koraku `Run JUnit tests`; neuspješan test zaustavlja build. Build također
 pada ako Surefire ne pronađe nijedan test.
 
 ---
 
 ## 11. CI/CD (GitHub Actions)
 
-- **CI:** svaki push na `main`, `feature/**`, `docs/**` i `fix/**` grane te otvaranje, ažuriranje ili ponovno otvaranje pull requesta prema `main` pokreće `./mvnw -B clean verify` (build i dostupne testove).
+- **CI:** svaki push na `main`, `feature/**`, `docs/**` i `fix/**` grane te otvaranje, ažuriranje ili ponovno otvaranje pull requesta prema `main` pokreće workflow.
+- **Kompajliranje:** korak `Compile application and tests` izvršava `./mvnw -B test-compile`.
+- **Testovi:** korak `Run JUnit tests` izvršava `./mvnw -B test`. Ako kompajliranje padne, testovi se preskaču; greška kompajliranja ili pad testa označava CI kao neuspješan.
+- **JUnit izvještaj:** `Publish JUnit test report` se izvršava uz `if: always()`, čak i nakon greške. Iz `target/surefire-reports/*.xml` prikazuje broj uspješnih, neuspješnih i preskočenih testova te pojedinačne rezultate u Actions sažetku i PR provjeri `JUnit test results`. Nedostatak XML izvještaja također označava korak neuspješnim, a ne kao prolazak testova.
+- **Pakovanje:** nakon uspješnih prethodnih koraka, `Package and verify` izvršava `./mvnw -B -DskipTests verify`, bez ponavljanja već izvršenih testova.
 - **Okruženje:** `ubuntu-latest`, Temurin JDK 27 i keširanje Maven zavisnosti.
 - **Status:** badge na vrhu README-a prikazuje stanje zadnjeg builda
 - **Planirano:** objavljivanje JAR artefakata i automatski GitHub Release za stabilne verzije označene Git tagom `v*` (npr. `v0.1.0`).
 
 Workflow datoteka: `.github/workflows/ci.yml`
+
+Na GitHubu otvori **Actions → CI → odabrano izvršavanje → Build and verify**
+za status svakog koraka, a sažetak izvršavanja za JUnit izvještaj.
+U Pull Requestu otvori **Checks → JUnit test results** za detalje testova.
+Za spajanje u `main` potrebno je da CI prođe i kolega odobri review.
+
+Objava posebne JUnit provjere koristi `checks: write` dozvolu standardnog
+`GITHUB_TOKEN` tokena; nije potreban lični token. Ovaj način objave namijenjen
+je timskim granama u istom repozitoriju. Za PR iz forka i Dependabot izvršavanja
+preskače se samo objava posebne provjere zbog read-only tokena; Actions sažetak
+i status CI posla ostaju dostupni.
 
 ---
 
