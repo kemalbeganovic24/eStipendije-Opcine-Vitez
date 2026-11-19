@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>27.0.1</javafx.version>
         <junit.version>5.14.2</junit.version>
+        <test.excluded.groups>integration</test.excluded.groups>
     </properties>
 
     <dependencies>
@@ -28,6 +29,12 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>26.10.0</version>
         </dependency>
 
         <dependency>
@@ -58,6 +65,7 @@
                 <version>3.5.4</version>
                 <configuration>
                     <failIfNoTests>true</failIfNoTests>
+                    <excludedGroups>${test.excluded.groups}</excludedGroups>
                 </configuration>
             </plugin>
 

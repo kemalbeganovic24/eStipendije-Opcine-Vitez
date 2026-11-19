@@ -196,8 +196,7 @@ stipvitez/
 ## 10. Pokretanje projekta
 ### Pokretanje JavaFX aplikacije (Maven Wrapper)
 
-Projekat koristi JavaFX, JDK 27 i Maven. Za pokretanje nije potrebno 
-zasebno instalirati Maven jer projekat sadrži Maven Wrapper.
+Projekat koristi JavaFX, JDK 27 i Maven. Za pokretanje nije potrebno zasebno instalirati Maven jer projekat sadrži Maven Wrapper.
 
 **Postupak:**
 
@@ -225,26 +224,82 @@ Za zaustavljanje aplikacije zatvoriti JavaFX prozor ili prekinuti proces u termi
 **Napomena:** Trenutna verzija aplikacije prikazuje samo početni JavaFX prozor. Funkcionalnosti koje zahtijevaju MySQL
 bazu bit će dostupne nakon implementacije baze podataka i DAO sloja.
 ### Preduvjeti
+
 - JDK 27
-- Maven 3.9+(zasebna instalacija nije potrebna ako se koristi Maven Wrapper)
-- MySQL 8 (lokalno ili Docker)
+- Maven Wrapper (uključen u projekat)
+- Pristup razvojnom Aiven MySQL servisu
+- Lokalno podešene environment varijable
+- Aiven CA certifikat i Java PKCS12 truststore
 
 ### 1. Baza podataka
-SQL skripte i konfiguracija baze bit će dodane u narednim fazama razvoja.
-```
-docker run --name stipvitez-db -e MYSQL_ROOT_PASSWORD=<lozinka> -e MYSQL_DATABASE=stipvitez -p 3306:3306 -d mysql:8
-mysql -u root -p stipvitez < db/schema.sql
-mysql -u root -p stipvitez < db/seed.sql
+
+Aplikacija koristi MySQL bazu `estipendija` na Aiven Cloud platformi.
+
+SQL skripte nalaze se u folderu `db/`:
+
+- `schema.sql` – struktura baze podataka
+- `triggers.sql` – SQL triggeri
+- `seed.sql` – početni razvojni i testni podaci
+
+Skripte ne treba ponovo izvršavati na postojećoj zajedničkoj bazi bez prethodnog dogovora s timom.
+
+### 2. Konfiguracija JDBC konekcije
+
+Aplikacija koristi `src/main/resources/application.properties`, koji sadrži reference na environment varijable bez stvarnih lozinki.
+
+Svaki član tima mora lokalno podesiti:
+
+| Varijabla | Opis |
+|---|---|
+| `DB_HOST` | Puna Host adresa iz Aiven Connection information |
+| `DB_PORT` | Port MySQL servisa na Aivenu |
+| `DB_USERNAME` | MySQL korisničko ime |
+| `DB_PASSWORD` | MySQL lozinka |
+| `DB_TRUSTSTORE_PASSWORD` | Lozinka lokalnog Java truststorea |
+
+Na Windowsu se varijable mogu podesiti kroz **Edit environment variables for your account → User variables**.
+
+Nakon izmjene potrebno je ponovno pokrenuti IntelliJ IDEA.
+
+**Sigurnost:** Stvarne lozinke, connection stringovi s kredencijalima, privatni ključevi i lokalni truststore ne smiju se objavljivati na GitHubu. Environment varijable su razvojno rješenje i nisu namjenski šifrirani sef za lozinke.
+
+### 2.1. TLS certifikat i truststore
+
+Aplikacija koristi TLS režim `VERIFY_IDENTITY`, koji provjerava certifikat i identitet Aiven servera.
+
+1. U Aiven konzoli otvoriti MySQL servis i preuzeti njegov CA certifikat (`ca.pem`).
+2. Na Windowsu kreirati lokalni folder `~/.estipendija`.
+3. Importovati CA certifikat u Java PKCS12 truststore.
+
+Primjer za PowerShell, ako je `ca.pem` u folderu Downloads:
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME\.estipendija" | Out-Null
+
+keytool -importcert -trustcacerts -noprompt -alias aiven-mysql-ca -file "$HOME\Downloads\ca.pem" -keystore "$HOME\.estipendija\aiven-truststore.p12" -storetype PKCS12
 ```
 
-### 2. Konfiguracija
+Prilikom kreiranja truststorea postaviti zasebnu lozinku i sačuvati je lokalno kao `DB_TRUSTSTORE_PASSWORD`.
 
+Svaki član tima priprema vlastiti lokalni truststore. Nije potrebno kopirati tuđi truststore ili dijeliti njegovu lozinku.
+
+### 2.2. Testiranje konekcije
+
+Obični JUnit testovi, bez povezivanja na Aiven:
+
+```powershell
+.\mvnw.cmd clean test
 ```
-cp src/main/resources/application.example.properties src/main/resources/application.properties
+
+Ručno pokretanje JDBC integracijskog testa:
+
+```powershell
+.\mvnw.cmd "-Dtest=DatabaseConnectionTest" "-Dtest.excluded.groups=" test
 ```
 
-Upiši parametre baze u `application.properties`. Ta datoteka je u `.gitignore` i nikad se ne commituje.
+Integracijski test otvara konekciju s bazom i izvršava read-only `SELECT` upit. Za njegovo pokretanje moraju biti dostupne lokalne environment varijable, truststore i Aiven servis.
 
+Integracijski test je isključen iz običnog Maven testiranja kako GitHub CI ne bi zahtijevao lokalne pristupne podatke članova tima.
 ### 3. Pokretanje
 
 ```

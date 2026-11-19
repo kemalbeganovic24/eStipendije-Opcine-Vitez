@@ -38,3 +38,25 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Environment variable files
+.env
+.env.*
+!.env.example
+
+# Local application configuration
+application-local.properties
+application-secret.properties
+application-secrets.properties
+
+# Local certificates and private keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Local database credential files
+mysql-credentials*
+db-credentials*
