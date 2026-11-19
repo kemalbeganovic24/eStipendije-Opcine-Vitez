@@ -285,7 +285,7 @@ pada ako Surefire ne pronađe nijedan test.
 - **Testovi:** korak `Run JUnit tests` izvršava `./mvnw -B test`. Ako kompajliranje padne, testovi se preskaču; greška kompajliranja ili pad testa označava CI kao neuspješan.
 - **JUnit izvještaj:** `Publish JUnit test report` se izvršava uz `if: always()`, čak i nakon greške. Iz `target/surefire-reports/*.xml` prikazuje broj uspješnih, neuspješnih i preskočenih testova te pojedinačne rezultate u Actions sažetku i PR provjeri `JUnit test results`. Nedostatak XML izvještaja također označava korak neuspješnim, a ne kao prolazak testova.
 - **Pakovanje:** nakon uspješnih prethodnih koraka, `Package application JAR` izvršava `./mvnw -B package -DskipTests`, bez ponavljanja već izvršenih testova. Nastaje `target/VitezeStipendija-1.0-SNAPSHOT.jar` s manifestom `Main-Class: org.example.Main`.
-- **Okruženje:** `ubuntu-latest`, Temurin JDK 27 i keširanje Maven zavisnosti.
+- **Okruženje:** `ubuntu-26.04`, Temurin JDK 27 i keširanje Maven zavisnosti u oba workflowa.
 - **Status:** badge na vrhu README-a prikazuje stanje zadnjeg builda
 - **CD:** korak `Upload application JAR` koristi `actions/upload-artifact@v4` i `if: success()` za objavu `target/VitezeStipendija-*.jar` pod nazivom `VitezeStipendija-jar`. Ako kompajliranje, testovi ili drugi prethodni koraci padnu, upload se preskače. Ako JAR nedostaje, upload korak prijavljuje grešku.
 - **Release:** push Git taga `v*` pokreće `.github/workflows/release.yml`. Na Temurin JDK-u 27 izvršava se `./mvnw -B clean verify`, zatim se objavljuje GitHub Release s automatskim bilješkama i JAR prilogom. Pad builda ili testova sprečava objavu; nedostatak JAR-a također prijavljuje grešku.
@@ -407,7 +407,7 @@ U folderu `docs/`:
 - UML dijagram klasa
 - Testni plan i testni slučajevi
 - Obrazloženje i opis primjene Scruma
-- Opis CI/CD procesa
+- [Opis implementiranog CI/CD procesa (PDF)](docs/Opis-implementiranog-CI-CD-procesa.pdf)
 - YouTrack export (zadaci, statusi, datumi)
 - Korisničko i tehničko uputstvo
 
