@@ -12,27 +12,30 @@ Desktop aplikacija za upravljanje stipendijama Općine Vitez.
 ## 1. O projektu
 
 ### Problem
-Dodjela općinskih stipendija se danas oslanja na papirne prijave, ručnu provjeru dokumenata i ručno bodovanje. To je sporo, podložno greškama i teško za praćenje, a građani nemaju uvid u to kako je odluka donesena.
+Dodjela općinskih stipendija se danas oslanja na papirne prijave, ručnu provjeru dokumenata i ručno bodovanje. To je sporo, podložno greškama i teško za praćenje, a građani nemaju uvid u to kako je odluka donesena. Studenti moraju fizički dostavljati prijave u općinu.
 
 ### Rješenje
-StipVitez digitalizira cijeli proces na strani općine: od kreiranja konkursa i unosa prijava, preko provjere dokumentacije i automatskog bodovanja po pravilniku, do rang-lista, ugovora i izvještaja u PDF formatu.
+Vitez eStipendija digitalizira cijeli proces: student sam podnosi prijavu elektronski, bez odlaska u općinu, a općinska služba upravlja konkursom, raspoređuje prijave komisiji, provjerava ih i boduje po pravilniku, te izrađuje rang-liste, ugovore i izvještaje u PDF formatu.
 
 ### Ciljevi
+- Studentima omogućiti podnošenje prijave bez odlaska u općinu
 - Smanjiti papirologiju i vrijeme potrebno komisiji za obradu prijava
 - Osigurati pravedno i ponovljivo bodovanje prema pravilniku
 - Povećati transparentnost kroz evidenciju svake izmjene (audit log)
 - Omogućiti brzo generisanje rang-lista, ugovora i izvještaja
 
 ### Naručilac
-Općina Vitez, Služba za djelatnosti. *(Status saradnje: u razgovoru.)*
+Općina Vitez, Služba za društvene djelatnosti. *(Status saradnje: u razgovoru.)*
 
 ---
 
 ## 2. Korisničke uloge
 
-- **Administrator:** upravlja konkursima, kriterijima, korisnicima, postavkama i backupom, ima uvid u audit log
-- **Član komisije:** pregleda dodijeljene prijave, boduje, korigira bodove uz obrazloženje, potvrđuje rang-listu, odlučuje o žalbama
-- **User-student:** Unosi potrebne podatke, predaje prijavu za stipendiju.
+- **Administrator (općinski službenik):** upravlja konkursima, kriterijima, korisnicima (dodaje i uređuje korisnike, među njima i članove komisije, te ih deaktivira ili briše), dodjeljuje prijave komisiji, vodi postavke i backup, ima uvid u sve prijave i audit log
+- **Član komisije:** vidi samo prijave koje su mu dodijeljene, pregleda ih i razmatra, boduje, korigira bodove uz obrazloženje, pravi i potvrđuje rang-listu, odlučuje o žalbama
+- **User (student / aplikant):** unosi svoje podatke i podnosi prijavu za stipendiju, vidi samo vlastitu prijavu i prati njen status. Dokumente šalje elektronski putem web aplikacije (faza 2)
+
+Student ne vidi tuđe prijave, korisnike ni postavke konkursa. Komisija ne unosi i ne mijenja prijave.
 
 ---
 
@@ -40,25 +43,27 @@ Općina Vitez, Služba za djelatnosti. *(Status saradnje: u razgovoru.)*
 
 ### Autentifikacija i autorizacija
 - Prijava korisnika, hashiranje lozinki (BCrypt)
-- Kontrola pristupa po ulogama u cijelom interfejsu
+- Kontrola pristupa po ulogama u cijelom interfejsu, uz provjeru u servisnom sloju
 - Promjena lozinke, zaključavanje računa nakon više neuspjelih pokušaja
 
 ### Konkursi
-- Kreiranje i uređivanje konkursa, kategorija, rokova
+- Kreiranje i uređivanje konkursa, kategorija, rokova (datum i sat isteka roka)
 - Definisanje kriterija bodovanja i obaveznih dokumenata
 - Statusi konkursa: nacrt, otvoren, zatvoren, objavljen, arhiviran
 
 ### Prijave i dokumenti
-- Unos kandidata i prijava kroz korake (Admin kreira članove komisije)
-- Prilaganje dokumenata uz validaciju tipa i veličine
+- Student sam podnosi prijavu: lični podaci, studij, kategorija, članovi domaćinstva i primanja
+- Sistem automatski dodjeljuje broj prijave, bilježi vrijeme zaprimanja i provjerava rok konkursa
+- Zaštita od dvostrukih prijava: jedan student ima jednu prijavu po konkursu
+- Slanje i prilaganje dokumenata (CIPS, potvrda o statusu studenta, kućna lista i dr.) elektronski uz validaciju tipa i veličine: **faza 2, web aplikacija**
 - Pregled dokumenata u aplikaciji, odobravanje ili odbijanje uz napomenu
-- Zaštita od dvostrukih prijava istog kandidata
 
 ### Raspodjela, bodovanje i rang-liste
 - Nasumična i ravnomjerna raspodjela prijava članovima komisije
 - Automatski izračun bodova iz konfigurabilnih pravila
 - Ručna korekcija bodova uz obavezno obrazloženje
 - Rang-liste s pravilima izjednačenja, potvrda i objava
+- Čuvanje verzija rang-lista (preliminarna i konačna)
 
 ### Izvještaji i ugovori
 - Izvoz rang-lista i izvještaja u PDF (iText / PDFBox) i Excel
@@ -75,15 +80,16 @@ Općina Vitez, Služba za djelatnosti. *(Status saradnje: u razgovoru.)*
 
 ## 4. Tok procesa
 
-1. Administrator kreira konkurs, kategorije, kriterije i listu obaveznih dokumenata, pa ga objavi
-2. Referent unosi prijave kandidata i prilaže dokumente
-3. Nakon roka, konkurs se zatvara za nove prijave
-4. Sistem nasumično raspoređuje prijave članovima komisije
-5. Dokumenti se provjeravaju, a po potrebi se traži dopuna
-6. Sistem računa bodove, a komisija može korigovati uz obrazloženje
-7. Generiše se preliminarna rang-lista i otvara žalbeni rok
-8. Nakon žalbi komisija potvrđuje konačnu listu
-9. Generišu se ugovori i izvještaji, a konkurs se arhivira
+1. Administrator kreira konkurs, kategorije, kriterije i listu obaveznih dokumenata, pa ga otvori za prijave
+2. Student sam podnosi prijavu: upisuje svoje podatke, bira kategoriju i unosi članove domaćinstva i primanja. Sistem dodjeljuje broj prijave, bilježi vrijeme zaprimanja i provjerava rok
+3. Student dokumente prilaže elektronski putem web aplikacije (faza 2) i prati status prijave
+4. Nakon isteka roka, konkurs se zatvara za nove prijave
+5. Administrator nasumično i ravnomjerno raspoređuje prijave članovima komisije
+6. Svaki član komisije pregleda samo svoje prijave, provjerava dokumente i po potrebi traži dopunu
+7. Sistem računa bodove, a komisija može korigovati uz obrazloženje
+8. Generiše se preliminarna rang-lista i otvara žalbeni rok
+9. Nakon žalbi komisija potvrđuje konačnu listu
+10. Generišu se ugovori i izvještaji, a konkurs se arhivira
 
 ### Statusi prijave
 DRAFT, PODNESENA, U_PROVJERI, DOPUNA_TRAŽENA, PROVJERENA, BODOVANA, NA_RANG_LISTI, ODOBRENA, ODBIJENA, ŽALBA, KONAČNA, POVUČENA
@@ -111,9 +117,11 @@ Slojevita (MVC + DAO) desktop aplikacija koja direktno koristi MySQL bazu.
 
 Pravila:
 - Kontroleri ne pristupaju bazi direktno, samo preko servisa i DAO sloja
-- Poslovna pravila (bodovanje, statusi) žive samo u servisnom sloju
+- Poslovna pravila (bodovanje, statusi, vlasništvo nad prijavom) žive samo u servisnom sloju
 - Svi SQL upiti koriste PreparedStatement (zaštita od SQL injectiona)
-- Dokumenti se čuvaju na disku, a u bazi su samo putanja, hash i metapodaci
+- Dokumenti se u fazi 2 šalju putem web aplikacije, a u bazi su samo putanja, hash i metapodaci
+
+**Ograničenje trenutne arhitekture:** desktop aplikacija se spaja direktno na bazu, pa svaka kopija aplikacije ima pristupne podatke. To je prihvatljivo za razvoj i demonstraciju na izmišljenim podacima, ali ne za stvarne studente (pogledati poglavlje 14 i 15).
 
 ---
 
@@ -122,14 +130,16 @@ Pravila:
 Glavne tabele:
 - **users**, **roles**: korisnici i uloge
 - **competitions**, **categories**, **criteria**, **required_documents**: konkursi i pravila
-- **candidates**, **applications**, **application_documents**: prijave i dokumenti
+- **candidates**, **applications**, **application_documents**: kandidati, prijave i dokumenti
+- **household_members**: članovi domaćinstva i primanja
+- **deficit_professions**: lista deficitarnih zanimanja po prioritetu
 - **score_items**: bodovi po kriteriju (automatski i ručni)
 - **application_assignments**: raspodjela prijava članovima komisije
 - **appeals**: žalbe
-- **contracts**: generisani ugovori
+- **contracts**, **payments**: ugovori i evidencija isplata
 - **audit_log**: evidencija izmjena
 
-Ključne veze: jedan konkurs ima više kategorija, kriterija i prijava, jedna prijava ima više dokumenata, bodova i žalbi, a jedan kandidat može imati samo jednu prijavu po konkursu.
+Ključne veze: jedan konkurs ima više kategorija, kriterija i prijava, jedna prijava ima više dokumenata, bodova i žalbi, jedan kandidat može imati samo jednu prijavu po konkursu, a svaka prijava pripada tačno jednom studentu.
 
 Detaljan ER dijagram: `docs/er-dijagram`.
 
@@ -144,7 +154,11 @@ Tipovi kriterija:
 - **SKALA:** vrijednosti se mapiraju na bodove (npr. broj članova domaćinstva)
 - **DA_NE:** fiksni bodovi ako je uslov ispunjen
 
-Svaka ručna korekcija zahtijeva obrazloženje i bilježi se u audit log.
+Pravila dosljednosti bodovanja (provjeravaju se u servisnom sloju, a dodatno ih čuvaju ograničenja i triggeri u bazi):
+- kriterij mora pripadati konkursu i kategoriji prijave koja se boduje
+- bodovi po kriteriju ne smiju prelaziti dozvoljeni maksimum
+- svaka ručna korekcija bodova zahtijeva obrazloženje i bilježi se u audit log
+- kriterij koji je već korišten za bodovanje ne mijenja se, nego se deaktivira
 
 ---
 
@@ -184,6 +198,7 @@ stipvitez/
     test/java/        - JUnit testovi
   db/
     schema.sql        - šema baze
+    triggers.sql      - SQL triggeri
     seed.sql          - testni podaci (izmišljeni)
   docs/               - ER, use case, UML, testni plan
   .github/workflows/
@@ -241,7 +256,7 @@ SQL skripte nalaze se u folderu `db/`:
 - `triggers.sql` – SQL triggeri
 - `seed.sql` – početni razvojni i testni podaci
 
-Skripte ne treba ponovo izvršavati na postojećoj zajedničkoj bazi bez prethodnog dogovora s timom.
+Skripte ne treba ponovo izvršavati na postojećoj zajedničkoj bazi bez prethodnog dogovora s timom. Izmjene šeme radi samo jedan član tima, preko numerisanih migracija u `db/migrations/`, uz pull request.
 
 ### 2. Konfiguracija JDBC konekcije
 
@@ -411,16 +426,16 @@ Dokaz primjene (burndown, retrospektive, export zadataka) nalazi se u `docs/scru
 
 ## 13. Rad s Gitom
 
-- **Grane:** `main` (stabilno),`feature/<opis>` (rad)
+- **Grane:** `main` (stabilno), `feature/<opis>` (rad)
 - **Pull request** je obavezan za spajanje u `main`, uz barem jedan review
-- **Commit poruke** počinju ID-om zadatka iz YouTracka, npr. `STIP-42: dodan login ekran`
+- **Commit poruke** počinju ID-om zadatka iz YouTracka, npr. `VES-42: dodan login ekran`
 - **Verzije** se označavaju tagovima (Semantic Versioning)
 
 ---
 
 ## 14. Sigurnost i zaštita podataka
 
-Aplikacija obrađuje lične podatke, pa se vodi računa o **Zakonu o zaštiti ličnih podataka BiH** (Sl. glasnik BiH 12/25):
+Aplikacija obrađuje lične podatke (uključujući podatke o domaćinstvu i primanjima), pa se vodi računa o **Zakonu o zaštiti ličnih podataka BiH** (Sl. glasnik BiH 12/25):
 
 - Lozinke se čuvaju isključivo kao BCrypt hash
 - Pristup funkcijama ovisi o ulozi korisnika
@@ -428,7 +443,26 @@ Aplikacija obrađuje lične podatke, pa se vodi računa o **Zakonu o zaštiti li
 - Sve bitne izmjene se bilježe u audit log
 - Razvoj i testiranje koriste **isključivo izmišljene podatke**
 - Konfiguracija i lozinke nikad ne ulaze u repozitorij
-- Roktovi čuvanja i brisanja podataka određuje općina kao kontrolor
+- Rokove čuvanja i brisanja podataka određuje općina kao kontrolor
+
+### 14.1. Sigurnost studentskih podataka
+
+Veza između studenta i njegovog zapisa kandidata (`candidates.user_id`) omogućava da se utvrdi vlasnik prijave, ali sama po sebi **ne sprečava neovlašteno čitanje**. Zato:
+
+- servisni sloj provjerava vlasništvo pri svakom čitanju i izmjeni prijave: student pristupa isključivo svojoj prijavi, član komisije samo dodijeljenim prijavama, a administrator svim prijavama
+- svaka metoda koja čita ili mijenja prijavu poziva provjeru prava (`Authorization` i provjera pristupa prijavi), a provjere su pokrivene JUnit testovima
+- studentima se **ne daju direktni MySQL pristupni podaci**. Studentski pristup se u fazi 2 ostvaruje isključivo kroz backend API, koji provjerava identitet i vlasništvo, a baza se ne izlaže studentskim računarima
+- do tada se desktop aplikacija s direktnom vezom na bazu koristi samo za razvoj i demonstraciju s izmišljenim podacima
+
+### 14.2. Dosljednost bodovanja
+
+Sistem mora osigurati da je bodovanje ispravno i ponovljivo:
+
+- kriterij bodovanja mora pripadati odgovarajućem konkursu i kategoriji prijave
+- bodovi po kriteriju ne smiju prelaziti dozvoljeni maksimum
+- ručne korekcije moraju imati obrazloženje i evidentirani identitet osobe koja ih je izvršila
+
+Ove provjere se rade u servisnom sloju, a dodatno ih čuvaju CHECK ograničenja i triggeri u bazi (`triggers.sql`), tako da ih ne može zaobići ni neispravan klijent.
 
 ---
 
@@ -439,18 +473,31 @@ Aplikacija obrađuje lične podatke, pa se vodi računa o **Zakonu o zaštiti li
 - [ ] Baza i DAO sloj
 - [ ] Autentifikacija i uloge
 - [ ] Konkursi, kriteriji, dokumenti
-- [ ] Prijave i provjera dokumentacije
-- [ ] Raspodjela, bodovanje, rang-liste
+- [ ] Prijave studenata, raspodjela komisiji i provjera prijava
+- [ ] Bodovanje, rang-liste
 - [ ] PDF izvještaji i ugovori
 - [ ] Analitika, backup, teme
 - [ ] Testiranje i CI/CD
 - [ ] Dokumentacija i prezentacija
 
 ### Faza 2: proširenje (nakon predaje, uz dogovor s općinom)
-- [ ] REST API sloj nad postojećom bazom
-- [ ] Web aplikacija za kandidate (online prijava, praćenje statusa)
+- [ ] Backend REST API ispred baze (studenti nikad ne dobijaju direktan pristup bazi)
+- [ ] Web aplikacija za studente: online prijava, slanje dokumenata, praćenje statusa
 - [ ] Email obavijesti
 - [ ] Javna stranica s rang-listama
+
+### Planirane izmjene baze i sigurnosti
+
+| Prioritet | Izmjena | Zašto |
+|---|---|---|
+| Visok | Povezati `users` i `candidates` (`candidates.user_id`) | Da student može pristupati isključivo svojoj prijavi |
+| Visok | Dodati socijalne podatke prijave | Nedostaju članovi domaćinstva i primanja |
+| Visok | Dodati vrijeme završetka konkursa | Trenutno postoji datum, ali ne i satnica poput 14:00 |
+| Srednji | Dodati `broj_protokola` | Automatska evidencija zaprimljene prijave |
+| Srednji | Dodati evidenciju verzija rang-lista | Čuvanje preliminarnih i konačnih rezultata |
+| Srednji | Provjeriti indekse i validacije | Brže pretrage i manje nekonzistentnih podataka |
+
+Uz izmjene šeme važe i dvije stvari opisane u poglavlju 14: provjera vlasništva nad prijavom u servisu i studentski pristup preko backend API-ja, te dosljednost bodovanja (kriterij pripada konkursu i kategoriji, bodovi unutar maksimuma, obrazloženje za ručne korekcije).
 
 ---
 
@@ -481,7 +528,7 @@ Politehnički fakultet Univerziteta u Zenici, Softversko inženjerstvo, akademsk
 
 ## 18. Status
 
-U razvoju. Zadnje ažuriranje: 14.10.2026.
+U razvoju. Zadnje ažuriranje: 21.11.2026.
 
 ## 19. Licenca i vlasništvo
 
