@@ -454,15 +454,26 @@ Veza između studenta i njegovog zapisa kandidata (`candidates.user_id`) omoguć
 - studentima se **ne daju direktni MySQL pristupni podaci**. Studentski pristup se u fazi 2 ostvaruje isključivo kroz backend API, koji provjerava identitet i vlasništvo, a baza se ne izlaže studentskim računarima
 - do tada se desktop aplikacija s direktnom vezom na bazu koristi samo za razvoj i demonstraciju s izmišljenim podacima
 
-### 14.2. Dosljednost bodovanja
+### Dokumenti u PDF formatu s ličnim podacima
+
+Studenti dokumente šalju kao PDF datoteke, a one sadrže lične podatke (ime i prezime, adresa, podaci iz lične karte, podaci o članovima domaćinstva i primanjima). Zbog toga:
+
+prihvataju se samo PDF datoteke, uz provjeru stvarnog sadržaja (ne samo ekstenzije), ograničenje veličine i sigurno ime datoteke
+dokument je vidljiv samo vlasniku prijave, dodijeljenom članu komisije i administratoru, uz provjeru vlasništva na backendu
+datoteke se čuvaju izvan javno dostupnog foldera, po mogućnosti šifrirane, a u bazi su samo putanja, hash i metapodaci
+veza za prijenos je šifrirana (HTTPS/TLS), a preuzimanje dokumenta se bilježi u audit log
+dokumenti se čuvaju samo koliko odredi općina kao kontrolor, nakon čega se brišu
+u razvoju i testiranju koriste se isključivo izmišljeni dokumenti.
+
+### 14.3. Dosljednost bodovanja
 
 Sistem mora osigurati da je bodovanje ispravno i ponovljivo:
 
-- kriterij bodovanja mora pripadati odgovarajućem konkursu i kategoriji prijave
-- bodovi po kriteriju ne smiju prelaziti dozvoljeni maksimum
-- ručne korekcije moraju imati obrazloženje i evidentirani identitet osobe koja ih je izvršila
+kriterij bodovanja mora pripadati odgovarajućem konkursu i kategoriji prijave
+bodovi po kriteriju ne smiju prelaziti dozvoljeni maksimum
+ručne korekcije moraju imati obrazloženje i evidentirani identitet osobe koja ih je izvršila
 
-Ove provjere se rade u servisnom sloju, a dodatno ih čuvaju CHECK ograničenja i triggeri u bazi (`triggers.sql`), tako da ih ne može zaobići ni neispravan klijent.
+Ove provjere se rade u servisnom sloju, a dodatno ih čuvaju CHECK ograničenja i triggeri u bazi (triggers.sql), tako da ih ne može zaobići ni neispravan klijent.
 
 ---
 
