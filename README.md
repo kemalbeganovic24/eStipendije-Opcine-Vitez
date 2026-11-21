@@ -32,7 +32,7 @@ Općina Vitez, Služba za djelatnosti. *(Status saradnje: u razgovoru.)*
 
 - **Administrator:** upravlja konkursima, kriterijima, korisnicima, postavkama i backupom, ima uvid u audit log
 - **Član komisije:** pregleda dodijeljene prijave, boduje, korigira bodove uz obrazloženje, potvrđuje rang-listu, odlučuje o žalbama
-- **Referent:** unosi prijave i dokumente, provjerava dokumentaciju
+- **User-student:** Unosi potrebne podatke, predaje prijavu za stipendiju.
 
 ---
 
@@ -49,7 +49,7 @@ Općina Vitez, Služba za djelatnosti. *(Status saradnje: u razgovoru.)*
 - Statusi konkursa: nacrt, otvoren, zatvoren, objavljen, arhiviran
 
 ### Prijave i dokumenti
-- Unos kandidata i prijava kroz korake
+- Unos kandidata i prijava kroz korake (Admin kreira članove komisije)
 - Prilaganje dokumenata uz validaciju tipa i veličine
 - Pregled dokumenata u aplikaciji, odobravanje ili odbijanje uz napomenu
 - Zaštita od dvostrukih prijava istog kandidata
